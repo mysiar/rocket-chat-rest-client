@@ -10,4 +10,5 @@ To run tests system variables are required
 * ROCKET_CHAT_REST_CLIENT_API_ROOT - ex. /api/v1/
 * ROCKET_CHAT_REST_CLIENT_USER
 * ROCKET_CHAT_REST_CLIENT_PASSWORD
+* OCKET_CHAT_REST_CLIENT_CHANNEL - ex. test
 

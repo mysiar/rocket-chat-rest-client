@@ -1,19 +1,23 @@
 <?php
+declare(strict_types=1);
 
 namespace RocketChat;
 
 use Httpful\Request;
-use RocketChat\Client;
 
-class User extends Client {
-	public $username;
+class User
+{
+    /** @var Client */
+    private $client;
+	private $username;
 	private $password;
 	public $id;
 	public $nickname;
 	public $email;
 
-	public function __construct($username, $password, $fields = array()){
-		parent::__construct();
+	public function __construct(Client $client, string $username, string $password, $fields = array())
+    {
+        $this->client = $client;
 		$this->username = $username;
 		$this->password = $password;
 		if( isset($fields['nickname']) ) {
@@ -24,11 +28,22 @@ class User extends Client {
 		}
 	}
 
+	public function getClient(): Client
+    {
+        return $this->client;
+    }
+
 	/**
 	* Authenticate with the REST API.
 	*/
-	public function login($save_auth = true) {
-		$response = Request::post( $this->api . 'login' )
+    /**
+     * @param bool $save_auth
+     * @return bool
+     * @throws \Httpful\Exception\ConnectionErrorException
+     */
+	public function login($save_auth = true): bool
+    {
+		$response = Request::post( $this->client->getApi() . 'login' )
 			->body(array( 'user' => $this->username, 'password' => $this->password ))
 			->send();
 
@@ -43,16 +58,19 @@ class User extends Client {
 			$this->id = $response->body->data->userId;
 			return true;
 		} else {
-			echo( $response->body->message . "\n" );
-			return false;
+			throw new Exception($response->body->message);
 		}
 	}
 
 	/**
 	* Gets a user’s information, limited to the caller’s permissions.
 	*/
+    /**
+     * @return array|bool|object|string
+     * @throws \Httpful\Exception\ConnectionErrorException
+     */
 	public function info() {
-		$response = Request::get( $this->api . 'users.info?userId=' . $this->id )->send();
+		$response = Request::get( $this->client->getApi() . 'users.info?userId=' . $this->id )->send();
 
 		if( $response->code == 200 && isset($response->body->success) && $response->body->success == true ) {
 			$this->id = $response->body->user->_id;
@@ -60,8 +78,7 @@ class User extends Client {
 			$this->email = $response->body->user->emails[0]->address;
 			return $response->body;
 		} else {
-			echo( $response->body->error . "\n" );
-			return false;
+            throw new Exception($response->body->error);
 		}
 	}
 

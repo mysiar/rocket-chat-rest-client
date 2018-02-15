@@ -5,8 +5,9 @@ namespace RocketChat;
 
 use Httpful\Request;
 
-class Client{
-
+class Client
+{
+    /** @var string */
 	public $api;
 
 	public function __construct(Config $config)
@@ -19,6 +20,11 @@ class Client{
 			->expectsJson();
 		Request::ini( $tmp );
 	}
+
+	public function getApi(): string
+    {
+        return $this->api;
+    }
 
 	/**
 	* Get version information. This simple method requires no authentication.
