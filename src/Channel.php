@@ -1,9 +1,9 @@
 <?php
+declare(strict_types=1);
 
 namespace RocketChat;
 
 use Httpful\Request;
-use RocketChat\Client;
 
 class Channel extends Client {
 
